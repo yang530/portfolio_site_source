@@ -1,7 +1,26 @@
 # Portfolio Website, Yang's Web Dev Space (Source code)
 This is the source code of my portfolio website, powered by React.js
 
+## Front End Features:
+1. Top Navbar
+*shows user's location based on IP address
+*shows weather and temperature. (top left) - (You may need to disable CORS-"Cross-Origina-Resource-Sharing" policy on your browser to get this feature working)
+*"FUN" button will start a mini game.
+*"TOP" button scrolls viewport to the top of the page.
 
+2. About Me
+*"Resume" shows a responsive HTML resume. 
+*"Linkedin" button directs to my Linkedin profile.
+*"Github" button opens my Github profile. 
+
+3. Featured Project
+*Shows the featured project. 
+*"Run It Now" will run (open) the project in a new window. 
+*"Download from Github" will download the project code from Github. 
+*"More of My Works" will open page /MyWorks.
+
+4. MyWorks page
+*This page fetches data from an a local JSON file and display information of works (projects) I have worked on. 
 
 # Getting Started with Create React App
 
