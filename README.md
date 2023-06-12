@@ -1,5 +1,5 @@
 # Portfolio Website, Yang's Web Dev Space (Source code)
-This is the source code of my portfolio website, powered by React.js
+This is the source code of my portfolio website, powered by React.js. It is still a work in progress.
 
 ## Front End Features:
 1. Top Navbar
