@@ -22,7 +22,7 @@ function AboutMe(props){
                             <img className="mx-1" src={require("../assets/icons/linkedin.svg").default} alt="" />
                             Linkedin
                         </button>
-                        <button onClick={()=>{window.location.assign(disContents.github)}} className="btn btn-lg my-1 mx-1 d-flex flex-row justify-content-evenly">
+                        <button onClick={()=>{openURL(disContents.github)}} className="btn btn-lg my-1 mx-1 d-flex flex-row justify-content-evenly">
                             <img className="mx-1" src={require("../assets/icons/github.svg").default} alt="" />
                             Github
                         </button>

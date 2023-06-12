@@ -28,7 +28,7 @@ function Title(){
             <div id="buttons_div" className="position-relative d-flex flex-row justify-content-center align-items-center">
                 <button className="btn btn-lg my-5 mx-5" onClick={()=>{scroll2Ele("contact_div")}}>✉️ Contact</button>
                 <button className="btn btn-lg my-5 mx-5" onClick={()=>{scroll2Ele("aboutMe_div")}}>🙋‍♂️ About Me</button>
-                <button className="btn btn-lg my-5 mx-5" onClick={()=>{scroll2Ele("pContent_div")}}>🖥️ My Works</button>
+                <button className="btn btn-lg my-5 mx-5" onClick={()=>{scroll2Ele("project_Name")}}>🖥️ My Works</button>
                 {/* <MyButton idName="testButton" marginX="mx-5" marginY="my-5" iconPath="happy_face.svg" bText="🔨Test Button" /> */}
             </div>
             <br/>
