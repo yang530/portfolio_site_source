@@ -1,54 +1,92 @@
 [
     {
         "title": "Featured Project",
-        "prjName": "Handy 7 Seg display",
-        "imgFolderPath": "local_imgs/sliderTest/",
+        "prjName": "Handy 7-Seg display",
+        "imgFolderPath": "local_imgs/featured_prj/",
         "imgNum": "3",
-        "runItNow": "/Error",
-        "githubLink": "/Error",
+        "runItNow": "",
+        "githubLink": "https://github.com/yang530/7seg_display",
         "description": [
-            "As Michael Harvey writes, paragraphs are “in essence—a form of punctuation, and like other forms of punctuation they are meant to make written material easy to read.”[1] Effective paragraphs are the fundamental units of academic writing; consequently, the thoughtful, multifaceted arguments that your professors expect depend on them. Without good paragraphs, you simply cannot clearly convey sequential points and their relationships to one another.",
+            "A Handy 7-seg display which displays time and has a stop watch function.",
             "\n\n",
-            "Many novice writers tend to make a sharp distinction between content and style, thinking that a paper can be strong in one and weak in the other, but focusing on organization shows how content and style converge in deliberative academic writing. Your professors will view even the most elegant prose as rambling and tedious if there isn’t a careful, coherent argument to give the text meaning. Paragraphs are the “stuff ” of academic writing and, thus, worth our attention here."
+            "Notable Features: ",
+            "\n",
+            "1. This web application is developed with HTML/CSS/Javascript for frontend and has fully functional backend features implemented with PHP and SQL.",
+            "\n",
+            "2. Has fully functional user login system implemented with PHP and SQL database.",
+            "\n",
+            "3. User can customize background image and welcome message when logged in.",
+            "\n",
+            "4. Has a stopwatch feature with split time function.",
+            "\n",
+            "5. Has world time feature with a list of 4 locations. Implemented with a web API. Background would change based on selected location and time of the day.",
+            "\n",
+            "6. Download the files from my Github page and deploy it on a server to run the application.",
+            "\n",
+            "7. Please refer to the Github page of the project for more detailed information.",
+            "\n\n"
+    
         ]
     },
     {
-        "title": "Project",
-        "prjName": "project 1",
-        "imgFolderPath": "local_imgs/sliderTest/",
-        "imgNum": "3",
-        "runItNow": "/Error",
-        "githubLink": "/Error",
+        "title": "Web Game",
+        "prjName": "Chasing The Sun",
+        "imgFolderPath": "local_imgs/chasing_the_sun/",
+        "imgNum": "4",
+        "runItNow": "https://yang530.github.io/ChasingTheSun/",
+        "githubLink": "https://github.com/yang530/ChasingTheSun",
         "description": [
-            "As Michael Harvey writes, paragraphs are “in essence—a form of punctuation, and like other forms of punctuation they are meant to make written material easy to read.”[1] Effective paragraphs are the fundamental units of academic writing; consequently, the thoughtful, multifaceted arguments that your professors expect depend on them. Without good paragraphs, you simply cannot clearly convey sequential points and their relationships to one another.",
+            "This is a mini web game powered by ZIMjs - https://zimjs.com/.",
             "\n\n",
-            "Many novice writers tend to make a sharp distinction between content and style, thinking that a paper can be strong in one and weak in the other, but focusing on organization shows how content and style converge in deliberative academic writing. Your professors will view even the most elegant prose as rambling and tedious if there isn’t a careful, coherent argument to give the text meaning. Paragraphs are the “stuff ” of academic writing and, thus, worth our attention here."
+            "Notes:",
+            "\n",
+            "1. The game is based on the Chinese legend of Kuafu -- an ancient diety who ran after the Sun.",
+            "\n",
+            "2. Left click to jump (click again for double jump while airborned) and avoid obstacles.",
+            "\n",
+            "3. Pick up foods and drink from river to recover health so that Kuafu could run further.",
+            "\n",
+            "4. Drinking from a river replenishes large amount of health. Reach the mileage of 99999999 to win.",
+            "\n",
+            "5. Spacebar to pause and unpause game."
         ]
     },
     {
-        "title": "Project",
-        "prjName": "project 2",
-        "imgFolderPath": "local_imgs/sliderTest/",
-        "imgNum": "3",
-        "runItNow": "/Error",
-        "githubLink": "/Error",
+        "title": "Javascript Class",
+        "prjName": "AjaxClient.js",
+        "imgFolderPath": "local_imgs/js_ajaxclient/",
+        "imgNum": "1",
+        "runItNow": "",
+        "githubLink": "https://github.com/yang530/js_AjaxClient",
         "description": [
-            "As Michael Harvey writes, paragraphs are “in essence—a form of punctuation, and like other forms of punctuation they are meant to make written material easy to read.”[1] Effective paragraphs are the fundamental units of academic writing; consequently, the thoughtful, multifaceted arguments that your professors expect depend on them. Without good paragraphs, you simply cannot clearly convey sequential points and their relationships to one another.",
+            "AjaxClient is a general purpose client side Javascript API class which makes xhr requests to backend or url and then relays response to front end. It is capable of both GET and POST operations.",
             "\n\n",
-            "Many novice writers tend to make a sharp distinction between content and style, thinking that a paper can be strong in one and weak in the other, but focusing on organization shows how content and style converge in deliberative academic writing. Your professors will view even the most elegant prose as rambling and tedious if there isn’t a careful, coherent argument to give the text meaning. Paragraphs are the “stuff ” of academic writing and, thus, worth our attention here."
+            "Please refer to the Github page of the project for more detailed information."
         ]
     },
     {
-        "title": "Project",
-        "prjName": "project 3",
-        "imgFolderPath": "local_imgs/sliderTest/",
-        "imgNum": "3",
-        "runItNow": "/Error",
-        "githubLink": "/Error",
+        "title": "React.js Component",
+        "prjName": "Popup Component",
+        "imgFolderPath": "local_imgs/popup_component/",
+        "imgNum": "2",
+        "runItNow": "",
+        "githubLink": "https://github.com/yang530/reactjs_popup",
         "description": [
-            "As Michael Harvey writes, paragraphs are “in essence—a form of punctuation, and like other forms of punctuation they are meant to make written material easy to read.”[1] Effective paragraphs are the fundamental units of academic writing; consequently, the thoughtful, multifaceted arguments that your professors expect depend on them. Without good paragraphs, you simply cannot clearly convey sequential points and their relationships to one another.",
+            "This is a popup component for React.js. It is modularized and easily scalable.",
             "\n\n",
-            "Many novice writers tend to make a sharp distinction between content and style, thinking that a paper can be strong in one and weak in the other, but focusing on organization shows how content and style converge in deliberative academic writing. Your professors will view even the most elegant prose as rambling and tedious if there isn’t a careful, coherent argument to give the text meaning. Paragraphs are the “stuff ” of academic writing and, thus, worth our attention here."
+            "Please refer to the Github page of the project for documentation about how to use this component."
+        ]
+    },
+    {
+        "title": "Website Source Code",
+        "prjName": "Portfolio Site Source Code",
+        "imgFolderPath": "local_imgs/portfoliosite_src/",
+        "imgNum": "2",
+        "runItNow": "",
+        "githubLink": "https://github.com/yang530/portfolio_site_source",
+        "description": [
+            "This is the source code of my portfolio website, powered by React.js, The source code of the very website you are looking at. It is still a work in progress.",
+            "\n\n"
         ]
     }
 ]
