@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Chasing Sun Test</title>
+
+<!-- zimjs.com - JavaScript Canvas Framework -->
+<script type=module>
+
+import zim from "https://zimjs.org/cdn/01/zim";
+
+const assets = ["kuafu_sprite.png", "kuafu_sprite.json", "ground2.png", "bg1.png", "bg2.png", "tree.png", "food.png", "bird.png", "bird.json", "sun.png", "sunface.png", "sunface.json", "river.png"];
+const path = "assets/";
+
+//game constants
+const fps = 75;
+const interval = 1000/fps; //game update interval
+const minSpd = 10; //minimum movement speed
+const spdInt = Math.floor(minSpd / 5);
+const maxSpd = minSpd + 5 * spdInt; //maximum movement speed
+const playerW = 50;
+const playerH = 140;
+const grdHeight = 55 + playerH / 2; //the height of ground
+const gAccel = 2; //gravity acceleration
+const kCode = " ";
+const tkMax = 120; //max threshold for keypress (milliseconds)
+const jumpForce = -50; //the speed applied to character when jump is initiated
+const milesMax = 99999999; //maximum mileage of the game
+const healthMax = minSpd*fps*60*2;  //maximum health of player
+const spawnProbThr = 70; //threshold for spawn type probability
+const spawnIntMin = 2000; //minimal spawn interval for obstacles
+const spawnIntMax = 5000;//maximum spawn interval for obstacles
+const spawnTMod = 1.5;
+
+//some game variables
+let lastFrameT = 0; //real frame time of the last frame
+let gameLoop = null;
+let spdNow = 3; //current speed of movement
+let tkd = null;
+
+let gState = -2; //indicate current game state: -2 = title_screen, -1 = ready_to_start  0 = pause, 1 = running, 2 = ended
+let startScreen = null; //start screen of the game
+let sun = null; // the sun you are chasing after
+let player = null; //the object of the player
+let isAired = false; //indicate whether player is airborned
+let gameUI = null; //game ui
+let milesNow = 0; //mileage has covered since game start, reach 99999999 to beat the game
+let health = Math.floor(healthMax / 2); //health of Kuafu (player)
+let obstacles = []; //interactable obstacles currently in the game
+let foods = []; //interactable items currently in the game
+
+//object spawn timers, note that they are objects so that they are parsed by reference
+let spawnT1 = {t: 0};
+let spawnT2 = {t: 1000};
+let spawnT3 = {t: 2000};
+let foodSpawnT = {t1: 1000, t0: new Date()};
+let jumpNum = 0; //indicate how many times the player has jumped
+let foodCount = 0;
+
+// See Docs under Frame for FIT, FILL, FULL, and TAG
+new Frame(FIT, 1400, 700, dark, dark, ready, assets, path);
+
+function ready() {
+
+    // given F (Frame), S (Stage), W (width), H (height)
+    // put code here
+    //initialize the game
+    const gameCont = new Container(W, H).centerReg(S);
+    let ground = initGround(gameCont);
+
+    //initialize UI
+    gameUI = initUI(gameCont);
+
+    //player shall be initialized last
+    player = initPlayer(gameCont);
+
+    //initialize start screen
+    startScreen = initStartScreen();
+
+    //put the sun on the screen
+    let sunPic = new Pic(assets[9]).reg(CENTER, CENTER).sca(0.3).loc(0.92*W, 0.15*H, gameCont);
+    let sunface = new Sprite({json: assets[11]}).sca(5).centerReg(sunPic).mov(-10, 20).run({label:"normal"});
+    sun = {face: sunface, pic: sunPic};
+
+    //set up control event
+    window.addEventListener("keyup", (e)=>{if(e.key == kCode){pauseGame()}});
+    window.addEventListener("mousedown", jumpKeyDown);
+    window.addEventListener("mouseup", jumpKeyUp);
+
+    //the game loop (ticker)
+    gameLoop = setInterval(fixedUpdate, interval);
+
+
+    //any game update per tick actions go here
+    function fixedUpdate(){
+        
+        let ft0 = new Date();
+
+        if(gState == 1){
+            //if game is supposed to be running...
+            rollBackground(ground, spdNow);
+            //apply gravity to player
+            gravity(player);
+            
+            //spawn obstacles
+            spawnObstacles(spawnT1, gameCont, 1);
+            //spawn more obstacles if game is in later stage
+            if(spdNow >= minSpd + spdInt * 2){
+                spawnObstacles(spawnT2, gameCont, 1.5);
+            }
+            if(spdNow >= maxSpd){
+                spawnObstacles(spawnT2, gameCont, 3);
+            }
+
+            //update obstacles
+            updateObstacles();
+
+            //spawn foods
+            spawnFood(foodSpawnT, gameCont);
+            //update foods
+            updateFoods();
+            
+            updateGDat();
+            S.update();
+            
+        }
+
+        //get last frame time
+        //frame time is used to correct timer
+        let ftNow = new Date();
+        lastFrameT = ftNow.getTime() - ft0.getTime();
+    }
+}
+
+//function to spawn food
+function spawnFood(timer, container){
+
+    //if it is time to spawn food
+    if(timer.t1 <= 0){
+
+        let prob = rand(0, 100, true);
+
+        if(prob <= 99){
+            //generate a normal food
+            //record current time
+            let tNow = new Date();
+            //random elevation of the food
+            let elev = rand(0.2*H, (H - grdHeight + (playerH / 2) - 0.5 * playerH));
+            //make hit box
+            let hitCont = new Rectangle(playerW, playerW, clear);
+            //load asset
+            let foodAsset = new Pic(assets[6]).sca(0.2).centerReg(hitCont);
+    
+            //adjust position
+            hitCont.reg(CENTER, BOTTOM).addTo(container);
+            hitCont.ord(1);
+            hitCont.x = W;
+            hitCont.y = elev;
+    
+    
+            //calculate the how much health pts this food worth (random)
+            let pts = Math.floor((tNow.getTime() - timer.t0.getTime()) * rand(0.9, 1.2, false));
+            //push new food into array
+            foods.push({hitBox: hitCont, hp: pts});
+
+        }else{
+            //generate a river
+            //drinking a river replenishes a lot of health
+            //generate hit box
+            let hitCont = new Rectangle(playerH, 0.15*H, clear);
+            //load asset
+            let pic = new Pic(assets[12]).centerReg(hitCont);
+            pic.width = 1.5 * playerH;
+            pic.heightOnly = hitCont.height;
+            //placement
+            hitCont.reg(CENTER, BOTTOM).addTo(container);
+            hitCont.ord(1);
+            hitCont.x = W;
+            hitCont.y = H;
+            gameUI.hBar.ord(2);
+            foods.push({hitBox: hitCont, hp: healthMax/2});
+        }
+
+        //reset timer
+        timer.t1 = rand(spawnIntMin*spawnTMod, spawnIntMax*spawnTMod);
+        timer.t0 = new Date();
+
+    }else{
+        //update timer
+        timer.t1 -= lastFrameT + interval;
+
+    }
+
+}
+
+//function to update foods
+function updateFoods(){
+
+    let maxIndex = foods.length - 1; 
+
+    //loop thru all foods
+    for(let i = maxIndex; i >= 0; i--){
+
+        //check for collision
+        if(detectCollision(foods[i]) == true){
+            //eat food
+            //add health points to player
+            health += foods[i].hp;
+            foodCount++;
+            //in case of health overflow
+            if(health > healthMax){
+                health = healthMax
+            }
+            //play animation for food
+            let foodEaten = foods[i];
+            foods[i].hitBox.animate({
+                    props: {widthOnly: 0},
+                    time: 0.2,
+                    call: ()=>{foodEaten.hitBox.dispose();}
+                });
+            //dispose of obj
+            //foods[i].hitBox.dispose();
+            foods.splice(i, 1);
+        }
+        else{
+
+            //check if obj is out of view
+            if(foods[i].hitBox.x < 0){
+                //dispose of the obj
+                foods[i].hitBox.dispose();
+                foods.splice(i, 1);
+            }
+            else{
+                //update position
+                foods[i].hitBox.x -= spdNow;
+            }
+
+        }
+
+
+    }
+
+}
+
+//function to run spawn timer and determine whether to spawn obstacles or not
+function spawnObstacles(timer, container, mod){
+    
+    if(mod == null){
+        mod = 1;
+    }
+
+    //if it is time to spawn an object
+    if(timer.t <= 0){
+        //zogr("spawn new obstacle");
+        let prob = rand(0, 100);
+        if(prob <= spawnProbThr){
+
+            //spawn an regular obtacle
+            //generate hit box
+            let size = rand(0.5, 1.5);
+            let hitCont = new Rectangle({width: size*playerW, height: size*playerH, color: clear});
+            hitCont.reg(CENTER, BOTTOM).addTo(container);
+            hitCont.ord(1);
+            //generate asset
+            let treePic = new Pic(assets[5]).sca(size).reg(CENTER, BOTTOM).center(hitCont);
+            //place hitCont on the ground
+            hitCont.x = W;
+            hitCont.y = H - grdHeight + (playerH / 2);
+            //hitBox is the hit box of the obj, spdXMod is the speed modifier based on spdNow
+            obstacles.push({hitBox: hitCont, spdXMod: 1});
+            //zogb(hitCont.x, hitCont.y);
+
+        }else{
+
+            //randomize elevation of the flying obstacle
+            let elev = rand(0.2*H, (H - grdHeight + (playerH / 2) - 0.5 * playerH)); 
+            //spawn a flying obstacle
+            let hitCont = new Rectangle({width: playerH, height: playerW, color: clear});
+            //load asset
+            let bird_sprite = new Sprite({json: assets[8]}).sca(1.8).centerReg(hitCont).run({label: "fly", time: 0.5, loop: true});
+            bird_sprite.mov(0, -1*playerW/4);
+            
+            hitCont.reg(CENTER, BOTTOM).addTo(container);
+            hitCont.ord(1);
+            hitCont.x = W;
+            hitCont.y = elev;
+            
+            //hitBox is the hit box of the obj, spdXMod is the speed modifier based on spdNow
+            obstacles.push({hitBox: hitCont, spdXMod: rand(1, 2)});
+            //zogb(hitCont.x, hitCont.y);
+
+        }
+
+        //reset timer
+        timer.t = rand(mod*spawnIntMin, mod*spawnIntMax);
+        
+    }
+    else{
+
+        //update timer
+        timer.t -= lastFrameT + interval;
+        //zogy("next obstacle in: " + timer.t.toString());
+
+    }
+    
+    
+
+}
+
+//function to update the obstacles
+//goes into the fixedUpdate
+function updateObstacles(){
+
+    let maxIndex = obstacles.length - 1;
+    //cycle thru all obstacles
+    //loop backward in case of deleting is needed
+    for(let i = maxIndex; i >= 0; i--){
+
+        //check collision of obj with player
+        if(detectCollision(obstacles[i]) == true){
+            endGame();
+            break;
+        }
+
+        //check if obj is out of view
+        if(obstacles[i].hitBox.x < 0){
+            //dispose of the obj
+            obstacles[i].hitBox.dispose();
+            obstacles.splice(i, 1);
+        }
+        else{
+            //update position
+            obstacles[i].hitBox.x -= obstacles[i].spdXMod * spdNow;
+        }
+
+    }
+
+}
+
+//function to detect collision of the obj with player
+function detectCollision(obj){
+
+    return obj.hitBox.hitTestBounds(player.hitBox);
+
+}
+
+//apply jump speed to an object
+//make an object jump if object's gravity is updated in the fixedUpdate()
+function jump(obj, force){
+
+    //zogo(jumpNum);
+
+    //jump if player is not already airborned
+    if(isAired == false || jumpNum < 2){
+        
+        //apply jump force to player
+        obj.spdY += force;
+        //indicate player is jumping
+        isAired = true;
+        jumpNum++; //variable for double jump
+        //play animations
+        player.sprite.run({time: 0.2, label: "jump"});
+        sun.face.run({label: "startled"});
+
+    }
+
+}
+
+//function to apply gravity to an obj in game
+//obj must be {sprite: kuafu_sprite, spdY: speedY, hitBox: hitCont}
+function gravity(obj){
+
+    //if obj is not on the ground
+    if(obj.hitBox.y != (H - grdHeight) || obj.spdY != 0){
+
+        //apply gravity acceleration to current verticle speed
+        obj.spdY += gAccel;
+        //check distance and spdY bw obj and ground
+        if(Math.abs(H - grdHeight - obj.hitBox.y) <= obj.spdY && obj.spdY > 0){
+            //if obj too close to the ground
+            //just place it on the ground
+            obj.hitBox.y = H - grdHeight;
+            obj.spdY = 0;
+            isAired = false;
+            jumpNum = 0;
+            //play animations
+            player.sprite.run({time: 0.5, label: "walk", loop: true});
+            sun.face.run({label: "normal"});
+        }
+        else{
+            //if not too close
+            //increment obj position based on spdY
+            obj.hitBox.y += obj.spdY;
+        }
+
+    }
+
+
+
+}
+
+//function to update game data
+function updateGDat(){
+
+    milesNow += spdNow;
+    health -= spdNow;
+
+    //adjust speed based on mileage
+    if(spdNow < maxSpd){
+
+        let spdMod = Math.floor(milesNow / (0.5 * healthMax));
+        //in case speed overflows
+        if(spdMod > (maxSpd - minSpd)){
+            spdMod = (maxSpd - minSpd);
+        }
+        let nuSpd = minSpd + spdMod;
+
+        if(nuSpd > spdNow){
+
+            spdNow = nuSpd;
+            zogr("changed to new speed: " + spdNow.toString());
+        }
+
+
+    }
+
+    if(milesNow >= milesMax || health <= 0){
+        //if destination reached
+        endGame();
+    }
+    else{
+        
+        //refresh UI
+        reFreshUI(milesNow, health);
+
+    }
+    
+}
+
+//function to refresh UI
+function reFreshUI(score, health){
+
+    let str = score.toString();
+    let loopEnd = 8 - str.length;
+    //add the appropriate number of 0 to score string
+    for(let i = 0; i < loopEnd; i++){
+        str = "0" + str;
+    }
+    //update score display
+    gameUI.scoreDis.text = str;
+    //update health bar
+    gameUI.hBar.widthOnly = W * (health / healthMax);
+
+}
+
+//function to initiate UI on the screen
+function initUI(container){
+
+    const scorePane = new Pane({width: 200, height: 50, modal: false}).reg(CENTER, TOP).addTo(container);
+    const scoreText = new Label("00000000", 30).centerReg(scorePane);
+    scorePane.x = W / 2; 
+    scorePane.y = 0;
+
+    const healthBar = new Rectangle({width: W/2, height: 0.03*H, color: yellow}).reg(CENTER, BOTTOM).addTo(container);
+    healthBar.x = W / 2;
+    healthBar.y = H;
+
+    scorePane.ord(2);
+    healthBar.ord(2);
+
+    return {scoreDis: scoreText, hBar: healthBar};
+
+}
+
+//function to initiate ground components of the game
+function initGround(container){
+
+    let ground1 = new Container(W, H).reg(LEFT, BOTTOM).addTo(container);
+    ground1.x = 0; ground1.y = H;
+    let ground2 = new Container(W, H).reg(LEFT, BOTTOM).addTo(container);
+    ground2.x = W; ground2.y = H;
+
+    let bgAsset1 = new Pic(assets[3], W, H).reg(LEFT, BOTTOM).addTo(ground1);
+    let bgAsset2 = new Pic(assets[4], W, H).reg(LEFT, BOTTOM).addTo(ground2);
+    bgAsset1.x = 0; bgAsset1.y = H;
+    bgAsset2.x = 0; bgAsset2.y = H;
+
+    let grdAsset1 = new Pic(assets[2], W, 0.15*H).reg(LEFT, BOTTOM).addTo(ground1);
+    let grdAsset2 = new Pic(assets[2], W, 0.15*H).reg(LEFT, BOTTOM).addTo(ground2);
+    grdAsset1.x = 0; grdAsset1.y = H;
+    grdAsset2.x = 0; grdAsset2.y = H;
+    
+    //zogr(ground1.x, ground1.y);
+    //zogr(ground2.x, ground2.y);
+    
+    //let gAsset1 = new Rectangle(W, 0.15*H, green).addTo(ground1);
+    //let gAsset2 = new Rectangle(W, 0.15*H, green).addTo(ground2);
+
+    return {grd1: ground1, grd2: ground2};
+
+}
+
+//function to roll the specified background (ground) component of the game backward  
+//grdObj must be {grd1: ground1, grd2: ground2}
+function rollBackground(grdObj, spd){
+
+    //if one of the grd obj is out of view
+    if(grdObj.grd1.x <= -W){
+        //if grd2 is ahead;
+        grdObj.grd1.x = grdObj.grd2.x + W;
+    }
+    if(grdObj.grd2.x <= -W){
+        //if grd1 is ahead;
+        grdObj.grd2.x = grdObj.grd1.x + W;
+    }
+
+    grdObj.grd1.x -= spd;
+    grdObj.grd2.x -= spd;
+
+}
+
+//function to initiate player character onscreen
+function initPlayer(container){
+
+    const hitCont = new Container(playerW, playerH).centerReg(container); //hit box of the obj
+    const kuafu_sprite = new Sprite({json: assets[1]}).sca(0.3).centerReg(hitCont); //sprite of the obj
+    
+    //initialize the object on the ground and in the middle of frame
+    hitCont.x = 0.3*W;
+    hitCont.y = H - grdHeight; 
+    hitCont.ord(2);
+
+    let speedY = 0; //verticle speed of the object
+
+    return {sprite: kuafu_sprite, spdY: speedY, hitBox: hitCont};
+}
+
+//function to end the game
+function endGame(){
+
+    gState = 2;
+    player.sprite.run({label: "stop"});
+
+    //remove control events
+    window.removeEventListener("keyup", (e)=>{if(e.key == kCode){pauseGame()}});
+    window.removeEventListener("mousedown", jumpKeyDown);
+    window.removeEventListener("mouseup", jumpKeyUp);
+
+    //play endgame animations
+    if(health <= 0){
+        player.hitBox.animate({
+            props: {rotation: 90, y: H - grdHeight},
+            time: 0.5,
+            call: initEndScreen
+        });
+    }else if(milesNow < milesMax){
+        player.hitBox.animate({
+            props: {rotation: -90, y: H - grdHeight},
+            time: 0.5,
+            call: initEndScreen
+        });
+    }else if(milesNow >= milesMax){
+        player.sprite.run({label: "jump"});
+        sun.face.run({label: "startled"});
+        player.hitBox.animate({
+            props: {x: 0.92*W, y: 0.15*H, width: 0},
+            time: 1,
+            call: initEndScreen
+        });
+    }
+    
+
+}
+
+//function to generate end game screen
+function initEndScreen(){
+
+    const endGamePane = new Pane({width: 0.5 * W, height: 0.5 * H, modal: false}).centerReg(S);
+    zogr("foodCount= " + foodCount.toString());
+
+    let hThres = endGamePane.height / 2 / 5;
+
+    let labelText = "Game Over";
+    //if player beat the game
+    if(milesNow >= milesMax){
+        labelText = "YOU WON!!!";
+        //set up easter egg
+        player.hitBox.removeFrom();
+        sun.pic.removeFrom();
+        let newCont = new Container();
+        player.hitBox.sca(1.5);
+        player.hitBox.centerReg(newCont);
+        player.sprite.run({label: "walk", loop: true});
+        sun.pic.centerReg(newCont).mov(-100, 0);
+        sun.face.run({label:"dead"});
+        player.hitBox.ord(1);
+        newCont.centerReg(S).mov(-W/2 - 100, 0);
+        newCont.animate({
+            props: {x: W + 100},
+            time: 10,
+            call: ()=>{newCont.dispose()}
+        });
+    }
+
+    new Label({text: labelText, size: 50, bold: true}).centerReg(endGamePane).mov(0, -1*3*hThres);
+    new Label("Your Score:", 20).centerReg(endGamePane).mov(0, -1*hThres);
+    //calculate final score
+    if(milesNow > milesMax){
+        //incase of overflow
+        milesNow = milesMax;
+    }
+    let finalscore = milesNow + 1000 * foodCount;
+    new Label(finalscore.toString(), 30).centerReg(endGamePane);
+    new Label("click anywhere to restart", 20).centerReg(endGamePane).mov(0, hThres);
+
+    //attach new event
+    window.addEventListener("mouseup", ()=>{
+        location.reload();
+    });
+
+    return endGamePane;
+
+}
+
+//function to generate the start game screen
+function initStartScreen(){
+
+    const cont = new Container(W, H).centerReg(S);
+    let text3 = new Label({text: "click anywhere to start game", size: 20, color: yellow, bold: true}).reg(CENTER, TOP).addTo(cont).loc(W/2, H*7/10);
+    let text1 = new Label({text: "夸父逐日", size: 80, color: red, bold: true, shadowColor: dark}).reg(CENTER, TOP).addTo(cont).loc(W/2, H*3/10);
+    let text2 = new Label({text: "CHASING the SUN", size: 50, color: orange, bold: true, shadowColor: dark}).reg(CENTER, TOP).addTo(cont).loc(W/2, H/2);
+
+    return {
+        mainCont: cont,
+        text1: text1,
+        text2: text2,
+        text3: text3
+    };
+
+}
+
+//function to update start screen
+function updateStartScreen(){
+
+    let nuText = "Guide Kuafu to avoid obstacles and enemies.\n\nLeft click to jump (click again while airborned to double jump),\nspacebar to pause. \n\nCollect apples and drink from river to replenish health."
+
+    if(startScreen != null){
+        startScreen.text2.dispose();
+        startScreen.text1.text = nuText;
+        startScreen.text1.size = 30;
+        startScreen.text1.center(startScreen.mainCont);
+        startScreen.text3.text = "click anywhere to begin!";
+    }
+
+}
+
+//function to pause and unpause game
+function pauseGame(){
+
+    if(gState == 0){
+
+        player.sprite.pauseRun(false);
+        gState = 1;
+
+    }else if(gState == 1){
+
+        gState = 0;
+        player.sprite.pauseRun(true);
+
+    }
+
+}
+
+
+//function for jump key down
+function jumpKeyDown(e){
+
+    if(gState == 1){
+        e.preventDefault();
+        tkd = new Date();
+    }
+
+}
+
+//function for jump key up
+function jumpKeyUp(e){
+
+    if(gState == 1){
+
+        e.preventDefault();
+        let tNow = new Date();
+        let tDiff = tNow.getTime() - tkd.getTime();
+        //console.log("key press time: " + tDiff.toString());
+
+        //apply jump speed to player
+        if(tDiff >= tkMax){
+            jump(player, jumpForce);
+        }
+        else{
+            jump(player, jumpForce * tDiff/tkMax);
+        }
+
+    }
+    else if(gState == -2){
+        updateStartScreen();
+        gState = -1;
+    }
+    else if(gState == -1){
+        //if it is the start of game
+        startScreen.mainCont.dispose();
+        player.sprite.run({time: 0.5, label: "walk", loop: true});
+        player.sprite.pauseRun(false);
+        gState = 1;
+    }
+
+}
+
+</script>
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+</head>
+<body></body>
+</html>
