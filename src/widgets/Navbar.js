@@ -27,17 +27,20 @@ function Navbar(props) {
       let objGeo = JSON.parse(geoLoc);
       //console.log(objGeo.city);
       
-      let str = `https://api.open-meteo.com/v1/forecast?latitude=${objGeo.latitude}&longitude=${objGeo.longitude}&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=auto`
-    
-      client.ajaxGet(str, (weather)=>{
-        let objW = JSON.parse(weather);
-        let wEmo = getWEmo(objW.current_weather.weathercode);
-        let tempNow = objW.current_weather.temperature;
-        let tempUnit = objW.daily_units.temperature_2m_max;
-        //console.log(objW.current_weather.temperature);
+      //let str = `https://api.open-meteo.com/v1/forecast?latitude=${objGeo.latitude}&longitude=${objGeo.longitude}&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=auto`
+      let strURL = `http://localhost:5000/getWeather/${objGeo.latitude}/${objGeo.longitude}`;
+
+      client.ajaxGet(strURL, (weatherStr)=>{
+
+        console.log(weatherStr);
+        
+        let objWeather = JSON.parse(weatherStr);
+        let wEmo = getWEmo(objWeather.current_weather.weathercode);
+        let tempNow = objWeather.current_weather.temperature;
+        let tempUnit = objWeather.daily_units.temperature_2m_max;
         let finalStr = `${objGeo.city} ${wEmo} ${tempNow}${tempUnit}`;
-        console.log(finalStr);
         document.getElementById("wInfo").innerText = finalStr;
+        
       })
     
     }
