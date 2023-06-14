@@ -29,7 +29,7 @@ function Navbar(props) {
       //console.log(objGeo.city);
       
       //let str = `https://api.open-meteo.com/v1/forecast?latitude=${objGeo.latitude}&longitude=${objGeo.longitude}&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=auto`
-      let strURL = `http://localhost:5000/getWeather/${objGeo.latitude}/${objGeo.longitude}`;
+      let strURL = `https://yangwebdev.herokuapp.com/getWeather/${objGeo.latitude}/${objGeo.longitude}`;
 
       client.ajaxGet(strURL, (weatherStr)=>{
 
