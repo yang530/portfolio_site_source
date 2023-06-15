@@ -15,7 +15,6 @@ function Navbar(props) {
         
         <button onClick={()=>{
           openURL("https://yang530.github.io/ChasingTheSun/");
-          //props.setPState(true);
         }} className="btn btn-outline-light my-1 mx-1"><ion-icon src={require("../assets/icons/happy_face.svg")}></ion-icon>🙃FUN</button>
 
         <button onClick={s2top} className="btn btn-outline-light my-1 mx-1"><ion-icon src={require("../assets/icons/arrow_up.svg")}></ion-icon>⬆TOP</button>
@@ -26,9 +25,7 @@ function Navbar(props) {
     function updateWeather(geoLoc){
 
       let objGeo = JSON.parse(geoLoc);
-      //console.log(objGeo.city);
       
-      //let str = `https://api.open-meteo.com/v1/forecast?latitude=${objGeo.latitude}&longitude=${objGeo.longitude}&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=auto`
       let strURL = `https://yangwebdev.herokuapp.com/getWeather/${objGeo.latitude}/${objGeo.longitude}`;
 
       client.ajaxGet(strURL, (weatherStr)=>{

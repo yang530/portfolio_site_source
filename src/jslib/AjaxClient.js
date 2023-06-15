@@ -57,9 +57,6 @@ export class AjaxClient{
 
         request.open(action.toString(), url.toString(), true);
         request.setRequestHeader("Content-type", headerStr);
-        //add following lines of code to avoid blocks by CORS policy of browser
-        //request.setRequestHeader("Access-Control-Allow-Headers", "*");
-        //request.setRequestHeader("Access-Control-Allow-Origin", "*");
 
         request.send(sendstr);
 
