@@ -11,6 +11,10 @@ html {font-size: 100%;} /*16px*/
 }
 
 #contact{
+    display: inline-block;
+}
+
+#contact{
     font-size: 0.9rem;
 }
 
@@ -28,15 +32,15 @@ body {
 }
 
 div {
-    margin: 1%;
+    margin-inline: 1%;
 }
 
 .rSection {
-    margin: 2%;
+    margin-inline: 2%;
 }
 
 .rSection li{
-    margin: 4%;
+    margin-inline: 4%;
 }
 
 p { 
