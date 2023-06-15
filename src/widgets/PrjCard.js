@@ -57,9 +57,6 @@ function PrjCard(props){
             disContents = props.inputData;
 
         }
-        else{
-            console.log("input data is null!");
-        }
 
     }
 

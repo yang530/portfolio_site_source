@@ -29,8 +29,6 @@ function Navbar(props) {
       let strURL = `https://yangwebdev.herokuapp.com/getWeather/${objGeo.latitude}/${objGeo.longitude}`;
 
       client.ajaxGet(strURL, (weatherStr)=>{
-
-        console.log(weatherStr);
         
         let objWeather = JSON.parse(weatherStr);
         let wEmo = getWEmo(objWeather.current_weather.weathercode);
