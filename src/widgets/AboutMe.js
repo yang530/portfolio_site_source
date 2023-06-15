@@ -44,7 +44,7 @@ function AboutMe(props){
 
         }
         else{
-            //console.log("input data is null!");
+            
             disContents = {
                 location: "DEFAULT",
                 email: "yjdeng13@yahoo.com",
