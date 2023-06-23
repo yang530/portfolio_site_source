@@ -1,0 +1,64 @@
+#aboutMe_div{
+    color: aliceblue;
+    margin-inline: 30%;
+    margin-top: 10%;
+    margin-bottom: 10%;
+}
+
+#aboutMe_div button{
+    color: rgb(30, 30, 30);
+    background-color: rgb(220, 180, 0);
+    font-weight: 500;
+    font-size:0.8em;
+}
+
+.paragraphs {
+    white-space: pre-line;
+}
+
+@media (max-width: 1000px){
+
+    #aboutMe_div{
+        margin-inline: 10%;
+    }
+
+    #aboutMe_div{
+        font-size: smaller;
+    }
+
+    #aboutMe_div button{
+        white-space: nowrap;
+    }
+
+}
+
+@media (max-width: 600px){
+
+
+    #aboutMe_div{
+        margin-inline: 5%;
+    }
+
+    #aboutMe_div button{
+        font-size: x-small;
+        padding: 1%;
+    }
+
+    #img_headshot{
+        width: 40vw;
+        height: 40vw;
+    }
+
+}
+
+@media (max-width: 350px){
+
+    #basic_info p{
+        margin:1%;
+    }
+
+    #basic_info h1{
+        margin: 1%;
+    }
+
+}
