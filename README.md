@@ -4,10 +4,11 @@ This is the source code of my portfolio website, powered by React.js. It is stil
 ## Website Domain name: https://yangswbspace-314e1018b0f8.herokuapp.com/
 
 ## How To Use
-1. At "client" folder: npm run build
-2. Copy "build" folder into "server" folder.
-3. At "server" folder: npm install.
-4. At "server" folder: node corsProxy.js. 
+1. At "client" folder: npm install
+2. At "client" folder: npm run build
+3. Copy "build" folder into "server" folder
+4. At "server" folder: npm install
+5. At "server" folder: node corsProxy.js
 
 ## Front End Features:
 1. Top Navbar
