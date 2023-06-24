@@ -26,7 +26,7 @@ function Navbar(props) {
 
       let objGeo = JSON.parse(geoLoc);
       
-      let strURL = `https://yangwebdev.herokuapp.com/getWeather/${objGeo.latitude}/${objGeo.longitude}`;
+      let strURL = `/getWeather/${objGeo.latitude}/${objGeo.longitude}`;
 
       client.ajaxGet(strURL, (weatherStr)=>{
         
