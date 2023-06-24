@@ -1,6 +1,13 @@
 # Portfolio Website, Yang's Web Dev Space (Source code)
 This is the source code of my portfolio website, powered by React.js. It is still a work in progress.
 
+## Website Domain name: https://yangswbspace-314e1018b0f8.herokuapp.com/
+
+## How To Use
+1. At "client" folder: npm run build
+2. Copy "build" folder into "server" folder.
+3. At server folder: node corsProxy.js. 
+
 ## Front End Features:
 1. Top Navbar
 *shows user's location based on IP address
@@ -20,7 +27,16 @@ This is the source code of my portfolio website, powered by React.js. It is stil
 *"More of My Works" will open page /MyWorks.
 
 4. MyWorks page
-*This page fetches data from an a local JSON file and display information of works (projects) I have worked on. 
+*This page fetches data from an a local JSON file and display information of works (projects) I have worked on.
+
+5. Responsive Design
+*The website is now fully responsive.
+
+## Backend Features
+
+1. corsProxy.js in server folder is an Express.js middleware.
+2. corsProxy.js carries out server side rendering of the React site.
+3. corsProxy.js executes API calls on the server side for the client site to be around CORS restrict of browser.
 
 # Getting Started with Create React App
 
