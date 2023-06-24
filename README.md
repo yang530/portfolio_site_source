@@ -6,7 +6,7 @@ This is the source code of my portfolio website, powered by React.js. It is stil
 ## How To Use
 1. At "client" folder: npm run build
 2. Copy "build" folder into "server" folder.
-3. At "server" foler: npm install.
+3. At "server" folder: npm install.
 4. At "server" folder: node corsProxy.js. 
 
 ## Front End Features:
